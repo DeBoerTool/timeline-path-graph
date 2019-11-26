@@ -1,11 +1,23 @@
 <?php
 
-namespace Dbt\PhpProject\Tests;
+namespace Dbt\Timeline\Tests;
 
+use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 
 class UnitTestCase extends TestCase
 {
+    public function now (): Carbon
+    {
+        static $now = null;
+
+        if (!$now) {
+            $now = Carbon::now();
+        }
+
+        return $now->copy();
+    }
+
     public static function rs (int $chars): string
     {
         $string = '';
