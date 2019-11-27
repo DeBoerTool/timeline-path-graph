@@ -3,19 +3,25 @@
 namespace Dbt\Timeline;
 
 use Carbon\Carbon;
-use Dbt\Timeline\Collections\SliceCollection;
 use Dbt\Timeline\Exceptions\TimetravelException;
 use Dbt\Timeline\Interfaces\SliceInterface;
+use Dbt\Timeline\Slice\Stack;
 
 class Slice implements SliceInterface
 {
+    /** @var string */
+    public static $anonymousName = 'anonymous';
+
     /** @var \Carbon\Carbon */
     private $start;
 
     /** @var \Carbon\Carbon */
     private $end;
 
-    public function __construct (Carbon $start, Carbon $end)
+    /** @var string */
+    private $name;
+
+    public function __construct (string $name, Carbon $start, Carbon $end)
     {
         if (!$start->isBefore($end)) {
             throw new TimetravelException();
@@ -23,6 +29,12 @@ class Slice implements SliceInterface
 
         $this->start = $start;
         $this->end = $end;
+        $this->name = $name;
+    }
+
+    public static function anonymous (Carbon $start, Carbon $end): self
+    {
+        return new self(self::$anonymousName, $start, $end);
     }
 
     public function start (): Carbon
@@ -35,13 +47,24 @@ class Slice implements SliceInterface
         return $this->end;
     }
 
-    /**
-     * Is the given timestamp contained within this slice (inclusive)?
-     */
-    public function contains (Carbon $timestamp): bool
+    public function name (): string
     {
-        return $timestamp->greaterThanOrEqualTo($this->start)
-            && $timestamp->lessThanOrEqualTo($this->end);
+        return $this->name;
+    }
+
+    /**
+     * Is the given start timestamp contained within this slice, not inclusive
+     * of the end timestamp? This exclusivity is important when casting
+     * slices to nodes, since nodes can be merged when they're exact.
+     */
+    public function contains (Carbon $start): bool
+    {
+        if ($start->greaterThanOrEqualTo($this->end)) {
+            return false;
+        }
+
+        return $start->greaterThanOrEqualTo($this->start)
+            && $start->lessThan($this->end);
     }
 
     /**
@@ -49,6 +72,6 @@ class Slice implements SliceInterface
      */
     public function overlaps (SliceInterface $slice): bool
     {
-        return SliceCollection::make([$this, $slice])->hasOverlaps();
+        return Stack::make($this, $slice)->hasOverlaps();
     }
 }

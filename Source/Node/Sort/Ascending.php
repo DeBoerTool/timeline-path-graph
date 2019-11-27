@@ -1,15 +1,13 @@
 <?php
 
-namespace Dbt\Timeline\Collections;
+namespace Dbt\Timeline\Node\Sort;
 
+use Dbt\Timeline\Interfaces\Node\SortingInterface;
 use Dbt\Timeline\Interfaces\NodeInterface;
 
-class NodeCollection
+class Ascending implements SortingInterface
 {
-    /** @var \Dbt\Timeline\Interfaces\NodeInterface[] */
-    private $nodes;
-
-    public function __construct (NodeInterface ...$nodes)
+    public function sort (NodeInterface ...$nodes): array
     {
         usort($nodes, function (NodeInterface $one, NodeInterface $two) {
             return $one->timestamp()->isBefore($two->timestamp())
@@ -17,6 +15,6 @@ class NodeCollection
                 : 1;
         });
 
-        $this->nodes = $nodes;
+        return $nodes;
     }
 }

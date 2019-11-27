@@ -7,6 +7,9 @@ use Dbt\Timeline\Interfaces\NodeInterface;
 
 class Node implements NodeInterface
 {
+    /** @var string */
+    public static $anonymousName = 'anonymous';
+
     /** @var \Carbon\Carbon */
     private $at;
 
@@ -19,6 +22,16 @@ class Node implements NodeInterface
         $this->name = $name;
     }
 
+    public static function make (string $name, Carbon $at): self
+    {
+        return new self($name, $at);
+    }
+
+    public static function anonymous (Carbon $at): self
+    {
+        return new self(self::$anonymousName, $at);
+    }
+
     public function name (): string
     {
         return $this->name;
@@ -27,5 +40,10 @@ class Node implements NodeInterface
     public function timestamp (): Carbon
     {
         return $this->at;
+    }
+
+    public function isAnonymous (): bool
+    {
+        return $this->name === self::$anonymousName;
     }
 }

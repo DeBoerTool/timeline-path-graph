@@ -3,7 +3,7 @@
 namespace Dbt\Timeline;
 
 use Carbon\Carbon;
-use Dbt\Timeline\Collections\SliceCollection;
+use Dbt\Timeline\Slice\Stack;
 
 class Path
 {
@@ -13,17 +13,18 @@ class Path
     /** @var \Carbon\Carbon */
     private $end;
 
-    /** @var \Dbt\Timeline\Collections\SliceCollection */
+    /** @var \Dbt\Timeline\Slice\Stack */
     private $slices;
 
     public function __construct (
         Carbon $start,
         Carbon $end,
-        SliceCollection $slices
+        Stack $slices
     )
     {
         $this->start = $start;
         $this->end = $end;
-        $this->slices = $slices;
+
+        $this->slices = $slices->truncate($start, $end);
     }
 }

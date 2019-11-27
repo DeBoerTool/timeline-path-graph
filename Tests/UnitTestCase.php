@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class UnitTestCase extends TestCase
 {
-    public function now (): Carbon
+    public function ts (int $minutes = 0): Carbon
     {
         static $now = null;
 
@@ -15,7 +15,7 @@ class UnitTestCase extends TestCase
             $now = Carbon::now();
         }
 
-        return $now->copy();
+        return $now->copy()->addMinutes($minutes);
     }
 
     public static function rs (int $chars): string

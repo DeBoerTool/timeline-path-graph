@@ -12,7 +12,7 @@ class SliceTest extends UnitTestCase
     {
         $this->expectException(TimetravelException::class);
 
-        $slice = new Slice($this->now(), $this->now()->addMinute());
+        $slice = Slice::anonymous($this->ts(), $this->ts()->addMinute());
 
         $this->assertNotNull($slice);
 
@@ -20,22 +20,22 @@ class SliceTest extends UnitTestCase
          * This will fail since the start and the end are equal when the end
          * should be greater than the start.
          */
-        new Slice($this->now(), $this->now());
+        Slice::anonymous($this->ts(), $this->ts());
     }
 
     /** @test */
     public function checking_if_a_slice_contains_a_timestamp (): void
     {
-        $slice = new Slice($this->now(), $this->now()->addMinute());
-        $timestamp = $this->now()->addHour();
+        $slice = Slice::anonymous($this->ts(), $this->ts()->addMinute());
+        $timestamp = $this->ts()->addHour();
 
         $this->assertFalse($slice->contains($timestamp));
 
-        $slice = new Slice($this->now()->subHour(), $this->now()->subMinute());
+        $slice = Slice::anonymous($this->ts()->subHour(), $this->ts()->subMinute());
 
         $this->assertFalse($slice->contains($timestamp));
 
-        $slice = new Slice($this->now(), $this->now()->addHours(2));
+        $slice = Slice::anonymous($this->ts(), $this->ts()->addHours(2));
 
         $this->assertTrue($slice->contains($timestamp));
     }
@@ -43,21 +43,21 @@ class SliceTest extends UnitTestCase
     /** @test */
     public function checking_if_a_slice_overlaps_another_slice (): void
     {
-        $slice1 = new Slice(
-            $this->now(),
-            $this->now()->addMinutes(1)
+        $slice1 = Slice::anonymous(
+            $this->ts(),
+            $this->ts()->addMinutes(1)
         );
 
-        $slice2 = new Slice(
-            $this->now()->addMinutes(2),
-            $this->now()->addMinutes(3)
+        $slice2 = Slice::anonymous(
+            $this->ts()->addMinutes(2),
+            $this->ts()->addMinutes(3)
         );
 
         $this->assertFalse($slice1->overlaps($slice2));
 
-        $slice3 = new Slice(
-            $this->now()->subMinutes(2),
-            $this->now()->addMinutes(3)
+        $slice3 = Slice::anonymous(
+            $this->ts()->subMinutes(2),
+            $this->ts()->addMinutes(3)
         );
 
         $this->assertTrue($slice1->overlaps($slice3));

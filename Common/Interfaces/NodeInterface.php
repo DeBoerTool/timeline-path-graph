@@ -8,4 +8,5 @@ interface NodeInterface
 {
     public function name (): string;
     public function timestamp (): Carbon;
+    public function isAnonymous (): bool;
 }
